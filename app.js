@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 const app = express(); // app - веб-сервер створення
 
-dotenv.config();
+dotenv.config(); // бере змінні з .env додає в налаш PC
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 

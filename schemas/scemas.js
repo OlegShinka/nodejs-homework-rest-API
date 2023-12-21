@@ -6,6 +6,7 @@ const contactAddSchema = Joi.object({
   }),
   email: Joi.string().required(),
   phone: Joi.string().required(),
+  favorites: Joi.boolean(),
 });
 const contactUpDateSchema = Joi.object({
   name: Joi.string(),
