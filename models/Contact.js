@@ -1,6 +1,6 @@
 // import { required } from "joi";
 import { Schema, model } from "mongoose";
-import { handleSaveError } from "./hooks.js";
+import { handleSaveError, addUpdateSetting } from "./hooks.js";
 const contactSchema = new Schema({
   name: {
     type: String,
@@ -17,8 +17,12 @@ const contactSchema = new Schema({
     default: false,
   },
 });
-
+//хуки:
 contactSchema.post("save", handleSaveError); //операція save у методі, яка викличе хук після невдалого збереження
+
+contactSchema.pre("findOneAndUpdate", addUpdateSetting); // хук який оновить також і у відповіді перед оновленням
+
+contactSchema.post("findOneAndUpdate", handleSaveError); //операція оновлення у методі, яка викличе хук після невдалого оновлення
 
 const Contact = model("contact", contactSchema);
 
