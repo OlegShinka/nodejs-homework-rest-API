@@ -1,8 +1,8 @@
-// import * as contactService from "../models/contacts.js";
 import { HttpErrors } from "../helpers/Httperrors.js";
 // import { contactAddSchema, contactUpDateSchema } from "../schemas/scemas.js";
 
 import Contact from "../models/Contact.js";
+
 // import { validateBody } from "../decorators/validateBody.js";
 
 const getAll = async (req, res, next) => {

@@ -16,6 +16,10 @@ const contactSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+  },
 });
 //хуки:
 contactSchema.post("save", handleSaveError); //операція save у методі, яка викличе хук після невдалого збереження
