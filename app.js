@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json()); // дає можливість отримувати тіло запиту
 
 app.use("/api/contacts", router); // якщо прийде запит з цієї адр шукай її в routes
-app.use("/api/users", routerAuth);
+app.use("/users", routerAuth);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Page not found" });

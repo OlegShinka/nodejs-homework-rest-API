@@ -1,6 +1,7 @@
 import express from "express";
 import * as contactControllers from "../../controllers/contacts-controllers.js";
 import { validateBody } from "../../decorators/validateBody.js";
+import authenticate from "../../middlewares/authenticate.js";
 import {
   contactAddSchema,
   contactUpDateSchema,
@@ -15,6 +16,8 @@ import {
 import { isValidId } from "../../middlewares/isValidId.js";
 
 const router = express.Router();
+
+router.use(authenticate); //не важливо який роут, перевір наявність валідного токена
 
 router.get("/", contactControllers.getAll);
 

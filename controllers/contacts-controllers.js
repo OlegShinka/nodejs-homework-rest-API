@@ -7,7 +7,8 @@ import Contact from "../models/Contact.js";
 
 const getAll = async (req, res, next) => {
   try {
-    const result = await Contact.find();
+    const { _id: owner } = req.user;
+    const result = await Contact.find({ owner });
     res.json(result);
   } catch (error) {
     next(error);
@@ -16,8 +17,9 @@ const getAll = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const result = await Contact.findById(contactId);
+    const { _id: contactId } = req.params;
+    const { _id: owner } = req.user;
+    const result = await Contact.findOne({ contactId, owner });
     if (!result) {
       throw HttpErrors(404, `Contact with id ${contactId} not FOUND!`);
     }
@@ -29,7 +31,8 @@ const getById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const result = await Contact.create(req.body);
+    const { _id: owner } = req.user;
+    const result = await Contact.create({ ...req.body, owner }); // додаєм в контакти поле owner з id юзера що робить приватні запити
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -38,8 +41,12 @@ const addContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const result = await Contact.findByIdAndUpdate(contactId, req.body);
+    const { _id: contactId } = req.params;
+    const { _id: owner } = req.user;
+    const result = await Contact.findOneAndUpdate(
+      { contactId, owner },
+      req.body
+    );
     if (!result) {
       throw HttpErrors(404, `Contact with id ${contactId} not FOUND!`);
     }
@@ -51,8 +58,9 @@ const updateContact = async (req, res, next) => {
 
 const deleteContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const result = await Contact.findByIdAndDelete(contactId);
+    const { _id: contactId } = req.params;
+    const { _id: owner } = req.user;
+    const result = await Contact.findOneAndDelete({ contactId, owner });
     if (!result) {
       throw HttpErrors(404, `Contact with id ${contactId} not FOUND!`);
     }
