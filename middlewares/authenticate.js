@@ -12,20 +12,20 @@ const authenticate = async (req, res, next) => {
   //перевірка чи є в рядку хедер слово bearer та токен
   const [bearer, token] = authorization.split(" ");
   if (bearer !== "Bearer") {
-    return next(HttpErrors(401, "not Bearer"));
+    return next(HttpErrors(401, "Authorization row not valid"));
   }
   //перевірка токена на валідність
   try {
     const { id } = jwt.verify(token, SECRET_KEY);
     // перевірка чи є такий Юзер
     const user = await User.findById(id);
-    if (!user) {
+    if (!user || !user.token || token !== user.token) {
       return next(HttpErrors(401, " User not define"));
     }
     req.user = user; //додаєм до обєкту user поле з даними користувача, який робить приватні запити
     next();
   } catch (error) {
-    next(HttpErrors(401, "token not valid"));
+    next(HttpErrors(401, "Unauthorized"));
   }
 };
 export default authenticate;

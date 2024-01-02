@@ -6,8 +6,7 @@ import authenticate from "../../middlewares/authenticate.js";
 
 const routerAuth = express.Router();
 
-routerAuth.use(authenticate); //не важливо який роут, перевір наявність валідного токена
-
+// routerAuth.use(authenticate); //не важливо який роут, перевір наявність валідного токена
 routerAuth.post(
   "/register",
   validateBody(userRegSchema),
@@ -16,10 +15,8 @@ routerAuth.post(
 
 routerAuth.post("/login", validateBody(userLogSchema), authControllers.logUser);
 
-routerAuth.get(
-  "/current",
-  validateBody(userLogSchema),
-  authControllers.currentUser
-);
+routerAuth.get("/current", authenticate, authControllers.currentUser);
+
+routerAuth.post("/logout", authenticate, authControllers.signOut);
 
 export default routerAuth;
