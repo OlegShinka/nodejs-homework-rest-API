@@ -15,7 +15,7 @@ const contactUpDateSchema = Joi.object({
 });
 
 const contactUpDateFavoriteSchema = Joi.object({
-  favorite: Joi.boolean().required(),
+  favorite: Joi.boolean(),
 });
 
 const userRegSchema = Joi.object({

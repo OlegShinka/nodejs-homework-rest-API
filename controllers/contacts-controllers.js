@@ -2,12 +2,14 @@ import { HttpErrors } from "../helpers/Httperrors.js";
 // import { contactAddSchema, contactUpDateSchema } from "../schemas/scemas.js";
 
 import Contact from "../models/Contact.js";
+import User from "../models/Users.js";
 
 // import { validateBody } from "../decorators/validateBody.js";
 
 const getAll = async (req, res, next) => {
   try {
     const { _id: owner } = req.user;
+
     const result = await Contact.find({ owner });
     res.json(result);
   } catch (error) {
@@ -17,9 +19,10 @@ const getAll = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const { _id: contactId } = req.params;
-    const { _id: owner } = req.user;
-    const result = await Contact.findOne({ contactId, owner });
+    const { contactId } = req.params;
+    console.log(req.params);
+    const { _id } = req.user;
+    const result = await Contact.findOne({ _id: contactId, owner: _id });
     if (!result) {
       throw HttpErrors(404, `Contact with id ${contactId} not FOUND!`);
     }
@@ -41,10 +44,11 @@ const addContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
-    const { _id: contactId } = req.params;
+    const { contactId } = req.params;
     const { _id: owner } = req.user;
+
     const result = await Contact.findOneAndUpdate(
-      { contactId, owner },
+      { _id: contactId, owner },
       req.body
     );
     if (!result) {
