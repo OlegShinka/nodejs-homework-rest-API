@@ -9,8 +9,13 @@ import User from "../models/Users.js";
 const getAll = async (req, res, next) => {
   try {
     const { _id: owner } = req.user;
-
-    const result = await Contact.find({ owner });
+    const { page = 1, limit = 5 } = req.query;
+    const skip = (page - 1) * limit;
+    //додали 3-ій аргумент в мет. find для пагінації
+    const result = await Contact.find({ owner /*favorite: true */ }, "-__v", {
+      skip,
+      limit,
+    }).populate("owner", "email"); //бере знач ключа email з обєкту owner дл більшої інформативності
     res.json(result);
   } catch (error) {
     next(error);
