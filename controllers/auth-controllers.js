@@ -53,10 +53,8 @@ const logUser = async (req, res, next) => {
 
 const currentUser = async (req, res) => {
   const { email, subscription } = req.user;
-
+  console.log("req.user :>> ", req.user);
   res.json({
-    // email: user.email,
-    // subscription: user.subscription,
     email,
     subscription,
   });
@@ -71,4 +69,25 @@ const signOut = async (req, res) => {
   });
 };
 
-export { regUser, logUser, currentUser, signOut };
+const upDateSubscr = async (req, res, next) => {
+  try {
+    const { ownerId } = req.params;
+    const { subscription } = req.user;
+
+    console.log("req.user :>> ", req.user);
+
+    const result = await User.findOneAndUpdate(
+      { _id: ownerId, subscription },
+      req.body
+    );
+
+    if (!result) {
+      throw HttpErrors(404, `User with ${ownerId} not found`);
+    }
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { regUser, logUser, currentUser, signOut, upDateSubscr };

@@ -1,6 +1,8 @@
 import { Schema, model } from "mongoose";
 import { handleSaveError } from "./hooks.js";
 
+export const subscriptionList = ["starter", "pro", "business"];
+
 const userSchema = new Schema({
   password: {
     type: String,
@@ -13,7 +15,7 @@ const userSchema = new Schema({
   },
   subscription: {
     type: String,
-    enum: ["starter", "pro", "business"],
+    enum: subscriptionList,
     default: "starter",
   },
   token: String,

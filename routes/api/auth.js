@@ -1,6 +1,10 @@
 import express from "express";
 import { validateBody } from "../../decorators/validateBody.js";
-import { userLogSchema, userRegSchema } from "../../schemas/scemas.js";
+import {
+  userLogSchema,
+  userRegSchema,
+  userUpdateSchema,
+} from "../../schemas/scemas.js";
 import * as authControllers from "../../controllers/auth-controllers.js";
 import authenticate from "../../middlewares/authenticate.js";
 
@@ -18,5 +22,12 @@ routerAuth.post("/login", validateBody(userLogSchema), authControllers.logUser);
 routerAuth.get("/current", authenticate, authControllers.currentUser);
 
 routerAuth.post("/logout", authenticate, authControllers.signOut);
+
+routerAuth.patch(
+  "/:ownerId/subscription",
+  authenticate,
+  validateBody(userUpdateSchema),
+  authControllers.upDateSubscr
+);
 
 export default routerAuth;

@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { subscriptionList } from "../models/Users.js";
 
 const contactAddSchema = Joi.object({
   name: Joi.string().required().messages({
@@ -15,7 +16,7 @@ const contactUpDateSchema = Joi.object({
 });
 
 const contactUpDateFavoriteSchema = Joi.object({
-  favorite: Joi.boolean(),
+  favorite: Joi.boolean().required(),
 });
 
 const userRegSchema = Joi.object({
@@ -28,10 +29,15 @@ const userLogSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
+const userUpdateSchema = Joi.object({
+  subscription: Joi.string().valid(...subscriptionList),
+});
+
 export {
   contactAddSchema,
   contactUpDateSchema,
   contactUpDateFavoriteSchema,
   userRegSchema,
   userLogSchema,
+  userUpdateSchema,
 };
