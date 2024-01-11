@@ -19,6 +19,10 @@ const userSchema = new Schema({
     default: "starter",
   },
   token: String,
+  avatarURL: {
+    type: String,
+    requred: true,
+  },
 });
 
 userSchema.post("save", handleSaveError); //операція save у методі, яка викличе хук після невдалого збереження

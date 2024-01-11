@@ -7,17 +7,23 @@ import {
 } from "../../schemas/scemas.js";
 import * as authControllers from "../../controllers/auth-controllers.js";
 import authenticate from "../../middlewares/authenticate.js";
+import { upload } from "../../middlewares/upload.js";
 
 const routerAuth = express.Router();
 
-// routerAuth.use(authenticate); //не важливо який роут, перевір наявність валідного токена
 routerAuth.post(
   "/register",
+  upload.single("avatarURL"),
   validateBody(userRegSchema),
   authControllers.regUser
 );
 
-routerAuth.post("/login", validateBody(userLogSchema), authControllers.logUser);
+routerAuth.post(
+  "/login",
+  upload.single("avatarURL"),
+  validateBody(userLogSchema),
+  authControllers.logUser
+);
 
 routerAuth.get("/current", authenticate, authControllers.currentUser);
 
@@ -27,7 +33,7 @@ routerAuth.patch(
   "/:ownerId/subscription",
   authenticate,
   validateBody(userUpdateSchema),
-  authControllers.upDateSubscr
+  authControllers.upDateSubscription
 );
 
 export default routerAuth;

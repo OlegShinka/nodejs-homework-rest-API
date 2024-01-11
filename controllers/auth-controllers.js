@@ -2,12 +2,23 @@ import User from "../models/Users.js";
 import { HttpErrors } from "../helpers/Httperrors.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import fs from "fs/promises";
+import path from "path";
 import "dotenv/config";
+// import { constrainedMemory } from "process";
+
 const { SECRET_KEY } = process.env;
 
 const regUser = async (req, res, next) => {
   const { email, password } = req.body;
 
+  const avatarPath = path.resolve("public", "avatars");
+
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(avatarPath, filename); //об'єднує шляхи
+
+  await fs.rename(oldPath, newPath);
+  const avatarURL = path.join("public", "avatars", filename);
   const user = await User.findOne({ email });
 
   if (user) {
@@ -16,10 +27,15 @@ const regUser = async (req, res, next) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    avatarURL,
+    password: hashPassword,
+  });
 
   res.status(201).json({
     user: { email: newUser.email, subscription: newUser.subscription },
+    avatarURL,
   });
 };
 
@@ -69,7 +85,7 @@ const signOut = async (req, res) => {
   });
 };
 
-const upDateSubscr = async (req, res, next) => {
+const upDateSubscription = async (req, res, next) => {
   try {
     const { ownerId } = req.params;
     const { subscription } = req.user;
@@ -90,4 +106,4 @@ const upDateSubscr = async (req, res, next) => {
   }
 };
 
-export { regUser, logUser, currentUser, signOut, upDateSubscr };
+export { regUser, logUser, currentUser, signOut, upDateSubscription };
