@@ -36,4 +36,11 @@ routerAuth.patch(
   authControllers.upDateSubscription
 );
 
+routerAuth.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  authControllers.upDateAvatar
+);
+
 export default routerAuth;
