@@ -8,10 +8,7 @@ import {
   contactUpDateFavoriteSchema,
 } from "../../schemas/scemas.js";
 
-import {
-  isEmptyBody,
-  isEmptyBodyFavorite,
-} from "../../middlewares/isEmptyBody.js";
+import { isEmptyBody } from "../../middlewares/isEmptyBody.js";
 
 import { isValidId } from "../../middlewares/isValidId.js";
 
@@ -43,7 +40,6 @@ router.put(
 router.patch(
   "/:contactId/favorite",
   isValidId,
-  isEmptyBodyFavorite,
   validateBody(contactUpDateFavoriteSchema),
   contactControllers.updateContact
 );

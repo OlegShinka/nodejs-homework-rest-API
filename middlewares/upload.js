@@ -17,8 +17,17 @@ const limits = {
   fileSize: 1024 * 1024 * 5,
 };
 
+const fileFilter = (req, file, callback) => {
+  const extention = file.originalname.split(".").pop();
+  if (extention === "exe" || extention === "txt") {
+    callback(HttpErrors(400, ".exe not valid extention"));
+  }
+  callback(null, extention);
+};
+
 const upload = multer({
   storage,
   limits,
+  fileFilter,
 });
 export { upload };
