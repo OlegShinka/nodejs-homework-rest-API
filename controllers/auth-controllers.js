@@ -6,7 +6,32 @@ import fs from "fs/promises";
 import path from "path";
 import "dotenv/config";
 import gravatar from "gravatar";
-const { SECRET_KEY } = process.env;
+import sendMail from "../helpers/sendEmail.js";
+import { nanoid } from "nanoid";
+
+const { SECRET_KEY, BASE_URL } = process.env;
+
+// const nodemailerConfig = {
+//   host: "smtp.ukr.net",
+//   port: 465, //25 465 2525
+//   secure: true,
+//   auth: {
+//     user: UKR_NET_FROM,
+//     pass: UKR_NET_PASSWORD,
+//   },
+// };
+// const transport = nodemailer.createTransport(nodemailerConfig);
+// const email = {
+//   from: UKR_NET_FROM,
+//   to: "gemimic421@rentaen.com",
+//   subject: "test email",
+//   html: "<strong> Very jussy email</strong>",
+// };
+// transport
+//   .sendMail(email)
+//   .then(() => console.log("email successfull"))
+//   .catch((error) => console.log(error.message));
+// //
 
 const regUser = async (req, res, next) => {
   const { email, password } = req.body;
@@ -21,13 +46,24 @@ const regUser = async (req, res, next) => {
   const hashPassword = await bcrypt.hash(password, 10);
 
   const avatarURL = gravatar.url(email);
+  const verificationToken = nanoid();
+
   const newUser = await User.create({
     ...req.body,
     avatarURL,
     password: hashPassword,
+    verificationToken,
     // додаємо в базу поле з посилання на аватарку
     avatarURL,
   });
+
+  const verifyEmail = {
+    to: email,
+    subject: "verify email",
+    html: `<a target = "_blank" href = "${BASE_URL}/api/users/verify/${verificationToken}">Click for verify email</a>`,
+  };
+
+  await sendMail(verifyEmail);
 
   res.status(201).json({
     user: { email: newUser.email, subscription: newUser.subscription },
@@ -41,6 +77,11 @@ const logUser = async (req, res, next) => {
 
   if (!user) {
     return next(HttpErrors(401, "Email or password is wrong"));
+  }
+
+  //перевірка чи новий юзер підтвердив свій ємейл
+  if (!user.verify) {
+    return next(HttpErrors(401, "Email not verify!"));
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password); // перевірка валідності паролю
@@ -121,6 +162,25 @@ const upDateAvatar = async (req, res) => {
   });
 };
 
+const verify = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  const user = await User.findOne({ verificationToken });
+
+  if (!user) {
+    return next(HttpErrors(401, "Email not found or already verify."));
+  }
+
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+
+  res.json({
+    message: "Email verify success.",
+  });
+};
+
 export {
   regUser,
   logUser,
@@ -128,4 +188,5 @@ export {
   signOut,
   upDateSubscription,
   upDateAvatar,
+  verify,
 };

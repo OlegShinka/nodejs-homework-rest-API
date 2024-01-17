@@ -18,6 +18,8 @@ routerAuth.post(
   authControllers.regUser
 );
 
+routerAuth.get("/verify/:verificationToken", authControllers.verify);
+
 routerAuth.post(
   "/login",
   upload.single("avatarURL"),
