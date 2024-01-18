@@ -1,6 +1,8 @@
 import express from "express";
 import { validateBody } from "../../decorators/validateBody.js";
+import { isEmptyBody } from "../../middlewares/isEmptyBody.js";
 import {
+  userEmailSchema,
   userLogSchema,
   userRegSchema,
   userUpdateSchema,
@@ -13,12 +15,20 @@ const routerAuth = express.Router();
 
 routerAuth.post(
   "/register",
+  isEmptyBody,
   upload.single("avatarURL"),
   validateBody(userRegSchema),
   authControllers.regUser
 );
 
 routerAuth.get("/verify/:verificationToken", authControllers.verify);
+
+routerAuth.post(
+  "/verify",
+  isEmptyBody,
+  validateBody(userEmailSchema),
+  authControllers.resendVerifyEmail
+);
 
 routerAuth.post(
   "/login",

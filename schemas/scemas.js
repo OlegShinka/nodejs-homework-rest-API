@@ -33,6 +33,10 @@ const userUpdateSchema = Joi.object({
   subscription: Joi.string().valid(...subscriptionList),
 });
 
+const userEmailSchema = Joi.object({
+  email: Joi.string().required(),
+});
+
 export {
   contactAddSchema,
   contactUpDateSchema,
@@ -40,4 +44,5 @@ export {
   userRegSchema,
   userLogSchema,
   userUpdateSchema,
+  userEmailSchema,
 };

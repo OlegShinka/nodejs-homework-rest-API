@@ -8,6 +8,7 @@ import "dotenv/config";
 import gravatar from "gravatar";
 import sendMail from "../helpers/sendEmail.js";
 import { nanoid } from "nanoid";
+import { error } from "console";
 
 const { SECRET_KEY, BASE_URL } = process.env;
 
@@ -63,11 +64,56 @@ const regUser = async (req, res, next) => {
     html: `<a target = "_blank" href = "${BASE_URL}/api/users/verify/${verificationToken}">Click for verify email</a>`,
   };
 
+  // надсилання листа підтвердження регістрації
   await sendMail(verifyEmail);
 
   res.status(201).json({
     user: { email: newUser.email, subscription: newUser.subscription },
     avatarURL,
+  });
+};
+
+const verify = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  const user = await User.findOne({ verificationToken });
+
+  if (!user) {
+    return next(HttpErrors(401, "Email not found or already verify."));
+  }
+
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+
+  res.json({
+    message: "Verification email success",
+  });
+};
+
+const resendVerifyEmail = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  //якщо юзера з таким ємейлом немає
+  if (!user) {
+    return next(HttpErrors(400, "Email not found"));
+  }
+  //якщо в обєкті user ключ verify:true, тобто юзер вже підтвердив свій email
+  if (user.verify) {
+    return next(HttpErrors(400, "Verification has already been passed"));
+  }
+
+  const verifyEmail = {
+    to: email,
+    subject: "verify email",
+    html: `<a target = "_blank" href = "${BASE_URL}/api/users/verify/${user.verificationToken}">Click for verify email</a>`,
+  };
+
+  await sendMail(verifyEmail);
+
+  res.json({
+    message: "Verification email sent",
   });
 };
 
@@ -162,25 +208,6 @@ const upDateAvatar = async (req, res) => {
   });
 };
 
-const verify = async (req, res, next) => {
-  const { verificationToken } = req.params;
-
-  const user = await User.findOne({ verificationToken });
-
-  if (!user) {
-    return next(HttpErrors(401, "Email not found or already verify."));
-  }
-
-  await User.findByIdAndUpdate(user._id, {
-    verify: true,
-    verificationToken: "",
-  });
-
-  res.json({
-    message: "Email verify success.",
-  });
-};
-
 export {
   regUser,
   logUser,
@@ -189,4 +216,5 @@ export {
   upDateSubscription,
   upDateAvatar,
   verify,
+  resendVerifyEmail,
 };
